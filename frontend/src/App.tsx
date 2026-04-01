@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, LayoutGrid, Server, Activity, ShieldCheck, Database, Kanban, AlertCircle, CheckCircle2, Layers, Sun, Moon, Sparkles } from 'lucide-react';
+import { Plus, LayoutGrid, Server, Activity, Layers, Sun, Moon, Sparkles, Settings } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ServerInfo, ServerPayload, Service } from './types';
 import { ServerCard, ServerModal, ServerDetail, ServiceList, DeleteConfirmModal, QuickAddModal } from './components/ServerComponents';
@@ -7,7 +7,6 @@ import AIChat from './components/AIChat';
 import { cn } from './lib/utils';
 import { createServer, deleteServer, fetchServers, updateServer } from './lib/api';
 
-type ViewMode = 'grid' | 'kanban';
 type ActiveTab = 'servers' | 'services' | 'detail';
 
 export default function App() {
@@ -15,7 +14,6 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingServer, setEditingServer] = useState<ServerInfo | null>(null);
-  const [viewMode, setViewMode] = useState<ViewMode>('kanban');
   const [activeTab, setActiveTab] = useState<ActiveTab>('servers');
   const [selectedServerId, setSelectedServerId] = useState<string | null>(null);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
@@ -155,21 +153,6 @@ export default function App() {
     maintenance: servers.filter(s => s.status === 'maintenance').length,
   };
 
-  const kanbanGroups = {
-    online: [] as { serverName: string, service: Service }[],
-    offline: [] as { serverName: string, service: Service }[],
-  };
-
-  filteredServers.forEach(server => {
-    server.services.forEach(service => {
-      // Map maintenance to offline (problem)
-      const group = service.status === 'maintenance' ? 'offline' : service.status;
-      if (kanbanGroups[group as keyof typeof kanbanGroups]) {
-        kanbanGroups[group as keyof typeof kanbanGroups].push({ serverName: server.name, service });
-      }
-    });
-  });
-
   const selectedServer = servers.find(s => s.id === selectedServerId);
 
   return (
@@ -179,19 +162,23 @@ export default function App() {
         <div className="w-12 h-12 bg-gradient-to-br from-brand-accent to-purple-500 rounded-2xl flex items-center justify-center shadow-lg shadow-brand-accent/30 pulse-glow">
           <Server className="w-6 h-6 text-white" />
         </div>
+
+        <div className="text-[10px] font-bold text-brand-text-secondary text-center leading-tight px-1">
+          Server<br/>Ops
+        </div>
+
         <div className="flex flex-col gap-4 flex-1">
-          <NavItem 
-            icon={<Activity className="w-5 h-5" />} 
-            active={activeTab === 'servers' || activeTab === 'detail'} 
+          <NavItem
+            icon={<Activity className="w-5 h-5" />}
+            active={activeTab === 'servers' || activeTab === 'detail'}
             onClick={() => setActiveTab('servers')}
           />
-          <NavItem 
-            icon={<Layers className="w-5 h-5" />} 
-            active={activeTab === 'services'} 
+          <NavItem
+            icon={<Layers className="w-5 h-5" />}
+            active={activeTab === 'services'}
             onClick={() => setActiveTab('services')}
           />
-          <NavItem icon={<Database className="w-5 h-5" />} />
-          <NavItem icon={<ShieldCheck className="w-5 h-5" />} />
+          <NavItem icon={<Settings className="w-5 h-5" />} />
         </div>
         
         <div className="pb-4 flex flex-col items-center gap-4">
@@ -265,33 +252,6 @@ export default function App() {
                     className="input-modern"
                   />
                 </div>
-
-                <div className="flex items-center gap-1 bg-brand-card/60 backdrop-blur-sm border border-brand-border p-1 rounded-2xl">
-                  <button
-                    onClick={() => setViewMode('kanban')}
-                    className={cn(
-                      "p-2.5 rounded-xl transition-all flex items-center gap-2 px-4",
-                      viewMode === 'kanban'
-                        ? "bg-brand-accent text-white shadow-lg shadow-brand-accent/25"
-                        : "text-brand-text-secondary hover:text-brand-text-primary hover:bg-brand-border/50"
-                    )}
-                  >
-                    <Kanban className="w-4 h-4" />
-                    <span className="text-xs font-bold">看板</span>
-                  </button>
-                  <button
-                    onClick={() => setViewMode('grid')}
-                    className={cn(
-                      "p-2.5 rounded-xl transition-all flex items-center gap-2 px-4",
-                      viewMode === 'grid'
-                        ? "bg-brand-accent text-white shadow-lg shadow-brand-accent/25"
-                        : "text-brand-text-secondary hover:text-brand-text-primary hover:bg-brand-border/50"
-                    )}
-                  >
-                    <LayoutGrid className="w-4 h-4" />
-                    <span className="text-xs font-bold">网格</span>
-                  </button>
-                </div>
               </div>
 
               {errorMessage && (
@@ -308,27 +268,12 @@ export default function App() {
                   </div>
                   <p className="text-lg font-medium mt-6">正在加载基础设施数据...</p>
                 </div>
-              ) : viewMode === 'kanban' ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <KanbanColumn
-                    title="健康"
-                    icon={<CheckCircle2 className="w-4 h-4 text-green-500" />}
-                    items={kanbanGroups.online}
-                    color="border-green-500/20"
-                  />
-                  <KanbanColumn
-                    title="问题"
-                    icon={<AlertCircle className="w-4 h-4 text-red-500" />}
-                    items={kanbanGroups.offline}
-                    color="border-red-500/20"
-                  />
-                </div>
               ) : (
                 <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {filteredServers.map(server => (
-                    <ServerCard 
-                      key={server.id} 
-                      server={server} 
+                    <ServerCard
+                      key={server.id}
+                      server={server}
                       onDelete={handleDeleteServer}
                       onEdit={handleEditServer}
                       onViewDetail={handleViewDetail}
@@ -410,47 +355,6 @@ export default function App() {
       />
 
       <AIChat onOpenServer={handleViewDetail} onApplyFilter={handleApplyFilter} />
-    </div>
-  );
-}
-
-function KanbanColumn({ title, icon, items, color }: { title: string, icon: React.ReactNode, items: { serverName: string, service: Service }[], color: string }) {
-  return (
-    <div className={cn("flex flex-col gap-4 p-5 rounded-3xl bg-brand-card/40 backdrop-blur-sm border shadow-lg", color)}>
-      <div className="flex items-center justify-between px-2">
-        <div className="flex items-center gap-2.5">
-          {icon}
-          <h3 className="font-bold text-sm uppercase tracking-wider">{title}</h3>
-        </div>
-        <span className="text-xs font-mono text-brand-text-secondary bg-brand-border/60 px-2.5 py-1 rounded-full font-semibold">
-          {items.length}
-        </span>
-      </div>
-
-      <div className="flex flex-col gap-3">
-        {items.map((item, idx) => (
-          <motion.div
-            key={idx}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.03 }}
-            className="glass p-4 rounded-2xl hover:border-brand-accent/40 hover:shadow-lg hover:shadow-brand-accent/5 transition-all duration-200 cursor-pointer group"
-          >
-            <div className="flex flex-col gap-1.5">
-              <span className="text-[10px] text-brand-text-secondary font-bold uppercase tracking-tight">{item.serverName}</span>
-              <span className="font-bold text-sm group-hover:text-brand-accent transition-colors">{item.service.name}</span>
-              {item.service.healthUrl && (
-                <span className="text-[10px] text-brand-accent truncate font-mono mt-1">{item.service.healthUrl}</span>
-              )}
-            </div>
-          </motion.div>
-        ))}
-        {items.length === 0 && (
-          <div className="py-10 text-center text-brand-text-secondary text-xs italic opacity-40">
-            此状态下无服务
-          </div>
-        )}
-      </div>
     </div>
   );
 }
