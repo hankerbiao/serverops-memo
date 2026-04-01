@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Plus, Server, Shield, Terminal, Trash2, Copy, Check, Link as LinkIcon, ArrowLeft, Key, User as UserIcon, Activity, Edit2, AlertTriangle, Sparkles } from 'lucide-react';
+import { X, Plus, Server, Shield, Terminal, Trash2, Copy, Check, Link as LinkIcon, ArrowLeft, Key, User as UserIcon, Activity, Edit2, AlertTriangle, Sparkles, FileText } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ServerInfo, ServerPayload, Service } from '../types';
 import { cn } from '../lib/utils';
@@ -220,6 +220,19 @@ export function ServerDetail({ server, onEdit, onBack }: ServerDetailProps) {
                   </div>
                 </div>
               </div>
+
+              {/* Notes Section */}
+              {server.notes && (
+                <div className="space-y-4">
+                  <h3 className="text-xs font-bold uppercase tracking-widest text-brand-text-secondary flex items-center gap-2">
+                    <FileText className="w-3 h-3" />
+                    备注
+                  </h3>
+                  <div className="bg-brand-bg/50 p-6 rounded-2xl border border-brand-border">
+                    <p className="text-sm text-brand-text-secondary whitespace-pre-wrap">{server.notes}</p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
