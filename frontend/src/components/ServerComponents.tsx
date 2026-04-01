@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Plus, Server, Shield, Terminal, Trash2, Copy, Check, Link as LinkIcon, ArrowLeft, Key, User as UserIcon, Activity, Edit2, AlertTriangle, Sparkles, FileText } from 'lucide-react';
+import { X, Plus, Server, Shield, Terminal, Trash2, Copy, Check, Link as LinkIcon, ArrowLeft, Key, User as UserIcon, Activity, Edit2, AlertTriangle, Sparkles, FileText, RotateCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ServerInfo, ServerPayload, Service } from '../types';
 import { cn } from '../lib/utils';
@@ -121,13 +121,39 @@ interface ServerDetailProps {
   server: ServerInfo;
   onEdit: () => void;
   onBack: () => void;
+  onRefreshServer?: (serverId: string) => void;
 }
 
-export function ServerDetail({ server, onEdit, onBack }: ServerDetailProps) {
+export function ServerDetail({ server, onEdit, onBack, onRefreshServer }: ServerDetailProps) {
+  const [checkingService, setCheckingService] = useState<string | null>(null);
   const statusColors = {
     online: 'bg-green-500',
     offline: 'bg-red-500',
     maintenance: 'bg-yellow-500',
+  };
+
+  const checkServiceHealth = async (serviceName: string, healthUrl: string) => {
+    setCheckingService(serviceName);
+    try {
+      const response = await fetch(healthUrl, { method: 'GET' });
+      const newStatus = response.status === 200 ? 'online' : 'offline';
+      // 通知父组件刷新服务器数据
+      if (onRefreshServer) {
+        onRefreshServer(server.id);
+      }
+    } catch {
+      if (onRefreshServer) {
+        onRefreshServer(server.id);
+      }
+    } finally {
+      setCheckingService(null);
+    }
+  };
+
+  const checkAllServices = async () => {
+    if (onRefreshServer) {
+      onRefreshServer(server.id);
+    }
   };
 
   return (
@@ -240,29 +266,51 @@ export function ServerDetail({ server, onEdit, onBack }: ServerDetailProps) {
         {/* Right Column: Services */}
         <div className="w-full md:w-96 space-y-6">
           <div className="glass rounded-3xl p-8">
-            <h3 className="text-xs font-bold uppercase tracking-widest text-brand-text-secondary mb-6 flex items-center gap-2">
-              <Terminal className="w-3 h-3" />
-              服务健康状态
-            </h3>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-brand-text-secondary flex items-center gap-2">
+                <Terminal className="w-3 h-3" />
+                服务健康状态
+              </h3>
+              <button
+                onClick={checkAllServices}
+                className="text-xs font-bold text-brand-accent hover:text-brand-accent/70 flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-brand-accent/10 transition-colors"
+                title="刷新所有服务状态"
+              >
+                <RotateCw className="w-3 h-3" />
+                刷新
+              </button>
+            </div>
             <div className="space-y-3">
               {server.services.map((service, idx) => (
                 <div key={idx} className="p-4 rounded-2xl bg-brand-bg border border-brand-border space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-sm">{service.name}</span>
-                    <span className={cn(
-                      "text-[9px] font-bold uppercase px-2 py-0.5 rounded border",
-                      service.status === 'online' ? "text-green-500 border-green-500/20 bg-green-500/10" : "text-red-500 border-red-500/20 bg-red-500/10"
-                    )}>
-                      {service.status}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      {service.healthUrl && (
+                        <button
+                          onClick={() => checkServiceHealth(service.name, service.healthUrl!)}
+                          disabled={checkingService === service.name}
+                          className="text-brand-text-secondary hover:text-brand-accent disabled:opacity-50"
+                          title="验证服务状态"
+                        >
+                          <RotateCw className={cn("w-3 h-3", checkingService === service.name && "animate-spin")} />
+                        </button>
+                      )}
+                      <span className={cn(
+                        "text-[9px] font-bold uppercase px-2 py-0.5 rounded border",
+                        service.status === 'online' ? "text-green-500 border-green-500/20 bg-green-500/10" : "text-red-500 border-red-500/20 bg-red-500/10"
+                      )}>
+                        {service.status}
+                      </span>
+                    </div>
                   </div>
                   {service.notes && (
                     <p className="text-xs text-brand-text-secondary">{service.notes}</p>
                   )}
                   {service.healthUrl && (
-                    <a 
-                      href={service.healthUrl} 
-                      target="_blank" 
+                    <a
+                      href={service.healthUrl}
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="text-[10px] text-brand-accent hover:underline flex items-center gap-1 truncate"
                     >

@@ -141,6 +141,15 @@ export default function App() {
     setActiveTab('detail');
   };
 
+  const handleRefreshServer = async (serverId: string) => {
+    try {
+      const updatedServers = await fetchServers();
+      setServers(updatedServers);
+    } catch (error) {
+      console.error('Failed to refresh server:', error);
+    }
+  };
+
   const handleApplyFilter = (value: string) => {
     setSearchQuery(value);
     setActiveTab('servers');
@@ -309,10 +318,11 @@ export default function App() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
             >
-              <ServerDetail 
-                server={selectedServer} 
+              <ServerDetail
+                server={selectedServer}
                 onEdit={() => handleEditServer(selectedServer)}
-                onBack={() => setActiveTab('servers')} 
+                onBack={() => setActiveTab('servers')}
+                onRefreshServer={handleRefreshServer}
               />
             </motion.div>
           )}
