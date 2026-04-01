@@ -46,6 +46,24 @@ class Settings(BaseSettings):
         description="Health check interval in seconds",
     )
 
+    # Alert Configuration
+    ALERT_ENABLED: bool = Field(
+        default=True,
+        description="Enable alert notifications",
+    )
+    ALERT_WEBHOOK_URL: str = Field(
+        default="http://rdm.cooacloud.com/api/platform/notify/bot",
+        description="Alert webhook URL",
+    )
+    ALERT_ITCODE: str = Field(
+        default="libiao1",
+        description="Alert recipient itcode",
+    )
+    ALERT_COMPONENT_NAME: str = Field(
+        default="ServerOps",
+        description="Alert component name",
+    )
+
     # Application
     APP_NAME: str = "ServerOps API"
     APP_VERSION: str = "1.0.0"

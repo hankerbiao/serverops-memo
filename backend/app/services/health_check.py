@@ -43,6 +43,9 @@ def check_server_ssh(ip: str, port: int = 22) -> bool:
 
 def run_health_checks(session: Session, servers_func: callable) -> None:
     """Execute health checks for all servers and services."""
+    # Import here to avoid circular imports
+    from backend.app.services.alert_service import record_alert, send_alert, should_send_alert
+
     servers = servers_func(session)
 
     for server in servers:
@@ -59,8 +62,15 @@ def run_health_checks(session: Session, servers_func: callable) -> None:
                 # Services without health check URL default to online
                 service_statuses.append(True)
 
-        # Update server status
+        # Determine new status
         new_status = "online" if server_online else "offline"
+
+        # Check for server status change -> send alert if needed
+        old_status = server.status
+        if old_status == "online" and new_status == "offline":
+            if should_send_alert(session, server.id, None):
+                send_alert(server.name, server.ip, "server", None, "offline")
+                record_alert(session, server.id, None, "server")
 
         # Update server in database
         stmt = (
@@ -73,12 +83,21 @@ def run_health_checks(session: Session, servers_func: callable) -> None:
         )
         session.exec(stmt)
 
-        # Update each service status
+        # Update each service status and check for alerts
         db_server = session.get(Server, server.id)
         if db_server:
             for i, svc in enumerate(db_server.services):
-                if i < len(service_statuses):
-                    svc.status = "online" if service_statuses[i] else "offline"
+                old_service_status = svc.status
+                new_service_status = "online" if service_statuses[i] else "offline"
+
+                # Update status
+                svc.status = new_service_status
+
+                # Check for service status change -> send alert if needed
+                if old_service_status == "online" and new_service_status == "offline":
+                    if should_send_alert(session, server.id, svc.name):
+                        send_alert(server.name, server.ip, "service", svc.name, "offline")
+                        record_alert(session, server.id, svc.name, "service")
 
         session.commit()
 

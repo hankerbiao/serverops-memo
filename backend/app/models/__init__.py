@@ -1,6 +1,7 @@
 """
 Database models.
 """
+from backend.app.models.alert import AlertRecord
 from backend.app.models.server import (
     Server,
     ServerBase,
@@ -13,6 +14,7 @@ from backend.app.models.server import (
 )
 
 __all__ = [
+    "AlertRecord",
     "Server",
     "ServerBase",
     "ServerTagLink",

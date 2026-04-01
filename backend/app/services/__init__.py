@@ -1,6 +1,11 @@
 """
 Business logic services.
 """
+from backend.app.services.alert_service import (
+    record_alert,
+    send_alert,
+    should_send_alert,
+)
 from backend.app.services.chat_service import (
     extract_server_info,
     fallback_chat_reply,
@@ -48,4 +53,8 @@ __all__ = [
     "check_service_health",
     "run_health_checks",
     "start_health_check_scheduler",
+    # Alert services
+    "send_alert",
+    "should_send_alert",
+    "record_alert",
 ]
