@@ -1,0 +1,113 @@
+# ===========================
+# Python
+# ===========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+*.egg
+MANIFEST
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+*.db
+*.sqlite
+*.sqlite3
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# ===========================
+# Node.js / Frontend
+# ===========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+lerna-debug.log*
+dist/
+dist-ssr/
+*.local
+.DS_Store
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ===========================
+# Logs
+# ===========================
+*.log
+logs/
+*.log.*
+
+# ===========================
+# Backend specific
+# ===========================
+backend/__pycache__/
+backend/*.db
+backend/.serverops-backend.log
+backend/.serverops-backend.pid
+backend/.ruff_cache/
+*.pyc
+
+# ===========================
+# Testing
+# ===========================
+coverage/
+.pytest_cache/
+htmlcov/
+
+# ===========================
+# Documentation
+# ===========================
+docs/.vitepress/dist/
+docs/.vitepress/cache/
+
+# ===========================
+# Claude Code / AI Tools
+# ===========================
+.claude/
+*.claude/
+
+# ===========================
+# Misc
+# ===========================
+*.bak
+*.tmp
+*.temp
+Thumbs.db
