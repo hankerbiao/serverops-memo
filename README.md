@@ -1,214 +1,309 @@
-# 5000 信息系统开发部 - 服务器运维管理系统
+<!--
+ServerOps Memo - Server Infrastructure Management System
+[![Python Version](https://img.shields.io/badge/python-3.13%2B-blue)](https://www.python.org/)
+[![React Version](https://img.shields.io/badge/react-19-blue)](https://react.dev/)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+-->
 
-> 5000信息系统开发部服务器运维管理系统，支持AI智能填充、健康检查和智能问答。
+<div align="center">
 
-## 功能特性
+# ServerOps Memo
 
-### 1. 服务器管理
-- 添加、编辑、删除服务器
-- 服务器状态监控（在线/离线/维护中）
-- 支持 SSH 凭证存储
+_5000信息系统开发部 - 服务器运维管理系统_
 
-### 2. AI 智能填充
-- 自然语言描述服务器信息，AI 自动提取并填充
-- 支持提取：IP、用户名、密码、服务名称、健康检查URL等
+A modern server infrastructure management system with AI-powered features.
 
-### 3. 健康检查
-- 自动检查服务器 SSH 端口连通性
-- 自动检查服务 healthUrl HTTP 状态码（200 = 正常）
-- 后台定时检查（每 5 分钟）
+[![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
+[![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
 
-### 4. AI 智能问答
-- 基于本地 Qwen3 AI 进行智能问答
-- 支持查询服务器、服务相关信息
-- 自动关联服务器记录和知识库
+</div>
 
-### 5. 快速录入
-- 一步完成：描述 → AI 提取 → 自动保存
+## Features
 
-## 技术栈
+### 1. Server Management
+- Add, edit, and delete servers
+- Real-time status monitoring (online/offline/maintenance)
+- SSH credential storage
+- Tag-based organization
 
-- **后端**: FastAPI + SQLite (SQLModel)
-- **前端**: React 19 + TypeScript + Vite + Tailwind CSS
-- **AI**: Qwen/Qwen3-30B-A3B-Instruct-2507 (本地部署)
+### 2. AI-Powered Quick Entry
+- Natural language server information extraction
+- Automatically extracts: IP, username, password, service names, health check URLs
+- Powered by local Qwen3 AI
 
-## 快速开始
+### 3. Health Monitoring
+- Automatic SSH port connectivity checks
+- HTTP health check for services (200 = healthy)
+- Background periodic checks (every 5 minutes)
 
-### 前置要求
+### 4. AI Assistant
+- Intelligent Q&A about your infrastructure
+- Context-aware responses based on your server data
+- Auto-links to relevant server records and knowledge base
+
+### 5. Quick Entry Workflow
+- One-step: Describe → AI Extract → Auto-save
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Backend | FastAPI + SQLite (SQLModel) |
+| Frontend | React 19 + TypeScript + Vite + Tailwind CSS |
+| AI | Qwen/Qwen3-30B-A3B-Instruct-2507 (local deployment) |
+
+## Quick Start
+
+### Prerequisites
 
 - Python 3.13+
 - Node.js 22+
-- 本地 AI 服务：`http://10.17.150.235:8000/v1`
+- Local AI service: `http://10.17.150.235:8000/v1`
 
-### 1. 启动后端
+### 1. Clone & Setup
+
+```bash
+git clone https://github.com/hankerbiao/serverops-memo.git
+cd serverops-memo
+```
+
+### 2. Backend Setup
 
 ```bash
 cd backend
 
-# 安装依赖
+# Create virtual environment (recommended)
+python3 -m venv venv
+source venv/bin/activate  # Linux/macOS
+# or: venv\Scripts\activate  # Windows
+
+# Install dependencies
 pip install -r requirements.txt
 
-# 启动服务
-python -m uvicorn backend.main:app --reload --port 8889
+# Start the server
+uvicorn backend.main:app --reload --port 8889
 
-# 或使用脚本
-bash backend/server.sh start
+# Or use the convenience script
+bash server.sh start
 ```
 
-### 2. 启动前端
+### 3. Frontend Setup
 
 ```bash
 cd frontend
 
-# 安装依赖
+# Install dependencies
 npm install
 
-# 创建环境配置
+# Create environment configuration
 echo "VITE_API_BASE_URL=http://127.0.0.1:8889" > .env.local
 
-# 启动开发服务器
+# Start development server
 npm run dev
 ```
 
-### 3. 访问系统
+### 4. Access the Application
 
-打开浏览器访问：http://localhost:5173
+Open your browser: http://localhost:5173
 
-## 使用指南
-
-### 添加服务器
-
-两种方式：
-
-1. **普通模式**：点击"添加服务器"按钮，填写完整表单
-2. **快速录入**：点击"快速录入"按钮，用自然语言描述服务器信息
-
-#### 快速录入示例
-
-```
-192.168.1.100，用户名 root，密码 password123，运行 Nginx 和 Docker 服务
-```
-
-AI 会自动提取：
-- IP: 192.168.1.100
-- 用户名: root
-- 密码: password123
-- 服务: Nginx, Docker
-
-### AI 助手
-
-点击右下角"AI 助手"按钮，可以：
-
-- 查询服务器信息
-- 搜索特定服务
-- 了解服务器状态
-- 故障排查建议
-
-#### 示例问题
-
-- "有哪些服务器？"
-- "Docker 在哪台服务器上？"
-- "Nginx 服务健康检查失败怎么办？"
-
-### 健康检查
-
-系统每 5 分钟自动检查：
-
-1. **服务器**：SSH 端口（22）连通性
-2. **服务**：healthUrl HTTP 状态码（200 = 在线）
-
-状态会在服务器详情页实时显示。
-
-## 项目结构
+## Project Structure
 
 ```
 serverops-memo/
-├── backend/                 # FastAPI 后端
-│   ├── main.py             # 应用入口
-│   ├── models.py           # 数据库模型
-│   ├── schemas.py          # Pydantic 模型
-│   ├── services.py         # 业务逻辑
-│   ├── db.py               # 数据库配置
-│   └── serverops.db        # SQLite 数据库
-├── frontend/               # React 前端
+├── backend/
+│   ├── app/                    # Application package
+│   │   ├── api/                # API endpoints
+│   │   │   ├── chat.py         # Chat endpoints
+│   │   │   ├── servers.py      # Server CRUD endpoints
+│   │   │   └── tags.py         # Tag endpoints
+│   │   ├── config.py           # Settings & configuration
+│   │   ├── database.py         # Database connection
+│   │   ├── main.py             # FastAPI application
+│   │   ├── models/             # SQLModel entities
+│   │   │   └── server.py       # Server, Service, Tag models
+│   │   ├── schemas/            # Pydantic schemas
+│   │   │   ├── chat.py         # Chat-related schemas
+│   │   │   └── server.py       # Server-related schemas
+│   │   └── services/           # Business logic
+│   │       ├── chat_service.py # AI chat logic
+│   │       ├── health_check.py # Health monitoring
+│   │       └── server_service.py # Server CRUD
+│   ├── tests/                  # Test suite
+│   ├── main.py                 # Entry point (compatibility)
+│   ├── models.py               # Re-export (compatibility)
+│   ├── schemas.py              # Re-export (compatibility)
+│   ├── services.py             # Re-export (compatibility)
+│   ├── db.py                   # Re-export (compatibility)
+│   ├── requirements.txt        # Python dependencies
+│   └── server.sh               # Server management script
+├── frontend/                   # React frontend
 │   ├── src/
-│   │   ├── App.tsx        # 主应用
-│   │   ├── components/    # React 组件
-│   │   ├── lib/           # API 客户端
-│   │   ├── types.ts       # TypeScript 类型
-│   │   └── index.css      # 样式
-│   └── dist/              # 构建产物
-└── docs/                  # 知识库文档
-    └── knowledge/         # Markdown 文档
+│   │   ├── App.tsx            # Main application
+│   │   ├── components/        # React components
+│   │   ├── lib/               # API client & utilities
+│   │   ├── types.ts           # TypeScript types
+│   │   └── index.css          # Styles
+│   ├── package.json
+│   └── vite.config.ts
+├── docs/                       # Knowledge base
+│   └── knowledge/             # Markdown documentation
+├── CLAUDE.md                  # Development guide
+├── .env.example               # Environment template
+└── README.md                  # This file
 ```
 
-## 环境变量
+## Environment Variables
 
-### 后端
+### Backend
 
-| 变量 | 默认值 | 说明 |
-|------|--------|------|
-| `SERVEROPS_DATABASE_URL` | `sqlite:///./serverops.db` | 数据库连接 |
-| `SERVEROPS_CORS_ORIGINS` | - | CORS 允许的源 |
-| `SERVEROPS_AI_URL` | `http://10.17.150.235:8000/v1` | AI 服务地址 |
-| `SERVEROPS_AI_MODEL` | `/models/Qwen/Qwen3-30B-A3B-Instruct-2507` | AI 模型 |
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `SERVEROPS_DATABASE_URL` | `sqlite:///./serverops.db` | Database connection |
+| `SERVEROPS_CORS_ORIGINS` | - | Comma-separated CORS origins |
+| `SERVEROPS_AI_URL` | `http://10.17.150.235:8000/v1` | AI service URL |
+| `SERVEROPS_AI_MODEL` | `/models/Qwen/Qwen3-30B-A3B-Instruct-2507` | AI model |
+| `GEMINI_API_KEY` | - | Google Gemini API key (optional) |
 
-### 前端
+### Frontend
 
-| 变量 | 默认值 | 说明 |
-|------|--------|------|
-| `VITE_API_BASE_URL` | `http://127.0.0.1:8889` | API 地址 |
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `VITE_API_BASE_URL` | `http://127.0.0.1:8889` | Backend API URL |
 
-## API 接口
+## API Endpoints
 
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | `/api/health` | 健康检查 |
-| GET | `/api/servers` | 获取服务器列表 |
-| POST | `/api/servers` | 创建服务器 |
-| PUT | `/api/servers/{id}` | 更新服务器 |
-| DELETE | `/api/servers/{id}` | 删除服务器 |
-| POST | `/api/assistant/query` | AI 问答 |
-| POST | `/api/ai/extract-server` | AI 提取服务器信息 |
+### Servers
 
-## 常见问题
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/servers` | List all servers |
+| POST | `/api/servers` | Create a server |
+| PUT | `/api/servers/{id}` | Update a server |
+| DELETE | `/api/servers/{id}` | Delete a server |
 
-### Q: 健康检查失败怎么办？
+### Tags
 
-A: 检查以下几点：
-1. 服务器 SSH 端口（22）是否开放
-2. 服务 healthUrl 是否可访问
-3. 网络连通性
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/tags` | List all tags |
+| POST | `/api/tags` | Create a tag |
+| PUT | `/api/tags/{id}` | Update a tag |
+| DELETE | `/api/tags/{id}` | Delete a tag |
 
-### Q: AI 助手回答不准确？
+### Chat & AI
 
-A: 确保：
-1. 本地 AI 服务正常运行
-2. 服务器信息已正确录入
-3. 知识库文档已添加
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/chat` | Chat with AI (Gemini) |
+| POST | `/api/assistant/query` | AI Q&A (local AI) |
+| POST | `/api/ai/extract-server` | Extract server info |
 
-### Q: 如何查看详细日志？
+### Health
 
-A: 查看后端日志文件：`backend/.serverops-backend.log`
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/health` | Health check |
 
-## 开发相关
+## Usage Guide
 
-### 运行测试
+### Adding a Server
+
+**Option 1: Normal Mode**
+Click "Add Server" button and fill in the complete form.
+
+**Option 2: Quick Entry**
+Click "Quick Entry" button and describe the server in natural language:
+
+```
+192.168.1.100, username root, password password123, running Nginx and Docker
+```
+
+AI will automatically extract:
+- IP: 192.168.1.100
+- Username: root
+- Password: password123
+- Services: Nginx, Docker
+
+### Using the AI Assistant
+
+Click the "AI Assistant" button (bottom-right) to:
+- Query server information
+- Search for specific services
+- Check server status
+- Get troubleshooting advice
+
+Example questions:
+- "Which servers do we have?"
+- "Where is Docker running?"
+- "What should I do when Nginx health check fails?"
+
+### Health Checks
+
+System automatically checks every 5 minutes:
+1. **Server**: SSH port (22) connectivity
+2. **Service**: healthUrl HTTP status (200 = online)
+
+Status is displayed in real-time on the server detail page.
+
+## Development
+
+### Running Tests
 
 ```bash
+# Backend tests
 pytest backend/tests/ -v
+
+# With coverage
+pytest backend/tests/ --cov=backend.app --cov-report=term-missing
 ```
 
-### 构建生产版本
+### Building for Production
 
 ```bash
+# Frontend build
 cd frontend
 npm run build
 ```
 
-### 代码规范
+### Code Style
 
-- 后端遵循 PEP 8
-- 前端使用 TypeScript + ESLint
-- 使用 Black 格式化 Python 代码
-- 使用 Prettier 格式化 JavaScript/TypeScript
+- Python: PEP 8, Black, isort, ruff
+- TypeScript: ESLint, Prettier
+
+## FAQ
+
+### Q: Health check failed - what to check?
+
+A: Verify:
+1. Server SSH port (22) is open
+2. Service healthUrl is accessible
+3. Network connectivity
+
+### Q: AI assistant gives inaccurate answers?
+
+A: Ensure:
+1. Local AI service is running
+2. Server information is correctly entered
+3. Knowledge base documents are added
+
+### Q: How to view detailed logs?
+
+A: Check backend log file: `backend/.serverops-backend.log`
+
+## License
+
+MIT License - see [LICENSE](LICENSE) for details.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+---
+
+<div align="center">
+
+Made with ❤️ by 5000信息系统开发部
+
+</div>

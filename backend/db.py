@@ -1,21 +1,8 @@
-from __future__ import annotations
+"""
+Database configuration (backward compatibility).
 
-import os
-from collections.abc import Generator
+Import from backend.app.database instead.
+"""
+from backend.app.database import get_engine, get_session, init_db
 
-from sqlmodel import Session, SQLModel, create_engine
-
-
-def get_engine():
-    database_url = os.getenv("SERVEROPS_DATABASE_URL", "sqlite:///./serverops.db")
-    connect_args = {"check_same_thread": False} if database_url.startswith("sqlite") else {}
-    return create_engine(database_url, connect_args=connect_args)
-
-
-def init_db() -> None:
-    SQLModel.metadata.create_all(get_engine())
-
-
-def get_session() -> Generator[Session, None, None]:
-    with Session(get_engine()) as session:
-        yield session
+__all__ = ["get_engine", "get_session", "init_db"]

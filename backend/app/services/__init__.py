@@ -1,23 +1,25 @@
 """
-Business logic services (backward compatibility).
-
-Import from backend.app.services instead.
+Business logic services.
 """
-from backend.app.services import (
-    check_server_ssh,
-    check_service_health,
-    create_server,
-    create_tag,
-    delete_server,
-    delete_tag,
+from backend.app.services.chat_service import (
     extract_server_info,
     fallback_chat_reply,
     generate_assistant_answer,
     generate_chat_reply,
-    list_servers,
-    list_tags,
+)
+from backend.app.services.health_check import (
+    check_server_ssh,
+    check_service_health,
     run_health_checks,
     start_health_check_scheduler,
+)
+from backend.app.services.server_service import (
+    create_server,
+    create_tag,
+    delete_server,
+    delete_tag,
+    list_servers,
+    list_tags,
     to_server_read,
     to_tag_read,
     update_server,

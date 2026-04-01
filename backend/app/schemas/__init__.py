@@ -1,9 +1,7 @@
 """
-Pydantic schemas (backward compatibility).
-
-Import from backend.app.schemas instead.
+Pydantic schemas.
 """
-from backend.app.schemas import (
+from backend.app.schemas.chat import (
     AssistantAnswer,
     AssistantKnowledge,
     AssistantRecord,
@@ -14,6 +12,8 @@ from backend.app.schemas import (
     ExtractServerResponse,
     ExtractedServerInfo,
     ExtractedService,
+)
+from backend.app.schemas.server import (
     ServerRead,
     ServerWrite,
     ServiceRead,
@@ -23,12 +23,14 @@ from backend.app.schemas import (
 )
 
 __all__ = [
+    # Server schemas
     "ServerRead",
     "ServerWrite",
     "ServiceRead",
     "ServiceWrite",
     "TagRead",
     "TagWrite",
+    # Chat schemas
     "ChatRequest",
     "ChatResponse",
     "AssistantResponse",
