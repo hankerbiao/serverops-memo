@@ -10,8 +10,10 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import httpx
+from sqlmodel import Session, select
 
 from backend.app.config import settings
+from backend.app.models.config import AIConfig
 from backend.app.schemas.chat import (
     AssistantAnswer,
     AssistantKnowledge,
@@ -23,6 +25,28 @@ from backend.app.schemas.server import ServerRead
 
 if TYPE_CHECKING:
     from backend.app.services.server_service import list_servers
+
+
+def _get_ai_config_from_db(session: Session | None = None) -> tuple[str, str]:
+    """Get AI config from database, fallback to settings if not found.
+
+    Returns:
+        tuple of (ai_url, ai_model)
+    """
+    # If no session provided, use settings directly
+    if session is None:
+        return settings.AI_URL, settings.AI_MODEL
+
+    try:
+        statement = select(AIConfig).limit(1)
+        config = session.exec(statement).first()
+        if config:
+            return config.ai_url, config.ai_model
+    except Exception as e:
+        print(f"Failed to get AI config from database: {e}")
+
+    # Fallback to settings
+    return settings.AI_URL, settings.AI_MODEL
 
 
 def build_chat_context(servers: list[ServerRead]) -> str:
@@ -76,10 +100,9 @@ def generate_chat_reply(message: str, servers: list[ServerRead]) -> tuple[str, b
     return reply, False
 
 
-def extract_server_info(description: str) -> ExtractedServerInfo:
+def extract_server_info(description: str, session: Session | None = None) -> ExtractedServerInfo:
     """Extract server info from natural language description using local AI."""
-    ai_url = settings.AI_URL
-    ai_model = settings.AI_MODEL
+    ai_url, ai_model = _get_ai_config_from_db(session)
 
     prompt = f"""你是一个服务器信息提取助手。从用户的描述中提取服务器信息，返回 JSON 格式。
 
@@ -276,10 +299,9 @@ def build_next_actions(records: list[AssistantRecord], knowledge: list[Assistant
     return actions
 
 
-def generate_assistant_answer(message: str, servers: list[ServerRead]) -> AssistantAnswer:
+def generate_assistant_answer(message: str, servers: list[ServerRead], session: Session | None = None) -> AssistantAnswer:
     """Generate assistant answer using local AI."""
-    ai_url = settings.AI_URL
-    ai_model = settings.AI_MODEL
+    ai_url, ai_model = _get_ai_config_from_db(session)
 
     # First try local AI
     try:

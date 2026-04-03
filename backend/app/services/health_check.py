@@ -49,9 +49,6 @@ def run_health_checks(session: Session, servers_func: callable) -> None:
     servers = servers_func(session)
 
     for server in servers:
-        # Check server SSH connectivity
-        server_online = check_server_ssh(server.ip)
-
         # Check all services health status
         service_statuses = []
         for service in server.services:
@@ -62,7 +59,8 @@ def run_health_checks(session: Session, servers_func: callable) -> None:
                 # Services without health check URL default to online
                 service_statuses.append(True)
 
-        # Determine new status
+        # Server is online if at least one service is online
+        server_online = any(service_statuses) if service_statuses else False
         new_status = "online" if server_online else "offline"
 
         # Check for server status change -> send alert if needed

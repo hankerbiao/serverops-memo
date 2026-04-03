@@ -160,115 +160,55 @@ export function ServerDetail({ server, onEdit, onBack, onRefreshServer }: Server
     <motion.div
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
-      className="space-y-8 page-enter"
+      className="page-enter"
     >
       <button
         onClick={onBack}
-        className="flex items-center gap-2 text-brand-text-secondary hover:text-brand-text-primary transition-colors group"
+        className="flex items-center gap-2 text-brand-text-secondary hover:text-brand-text-primary transition-colors group mb-6"
       >
         <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
         <span className="text-sm font-bold">返回服务器列表</span>
       </button>
 
-      <div className="flex flex-col md:flex-row gap-8">
-        {/* Left Column: Info & Credentials */}
-        <div className="flex-1 space-y-6">
-          <div className="glass rounded-3xl p-8 shadow-xl shadow-black/5">
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-6">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-accent/20 to-purple-500/10 flex items-center justify-center border border-brand-accent/20 shadow-lg shadow-brand-accent/10">
-                  <Server className="w-8 h-8 text-brand-accent" />
-                </div>
-                <div>
-                  <h2 className="text-3xl font-black tracking-tight">{server.name}</h2>
-                  <code className="text-brand-accent font-mono bg-brand-accent/10 px-3 py-1 rounded-lg">{server.ip}</code>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={onEdit}
-                  className="flex items-center gap-2 bg-brand-accent/10 text-brand-accent px-5 py-2.5 rounded-2xl border border-brand-accent/20 hover:bg-brand-accent hover:text-white hover:shadow-lg hover:shadow-brand-accent/20 transition-all font-bold text-sm"
-                >
-                  <Edit2 className="w-4 h-4" />
-                  编辑
-                </button>
-                <div className={cn(
-                  "flex items-center gap-3 px-5 py-2.5 rounded-2xl border font-bold text-sm uppercase tracking-wider",
-                  server.status === 'online' && "status-online",
-                  server.status === 'offline' && "status-offline",
-                  server.status === 'maintenance' && "status-maintenance"
-                )}>
-                  <div className={cn("w-2 h-2 rounded-full animate-pulse", statusColors[server.status])} />
-                  {server.status}
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-4">
-                <h3 className="text-xs font-bold uppercase tracking-widest text-brand-text-secondary flex items-center gap-2">
-                  <Shield className="w-3 h-3" />
-                  访问凭证
-                </h3>
-                <div className="space-y-4 bg-brand-bg/50 p-6 rounded-2xl border border-brand-border">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <UserIcon className="w-4 h-4 text-brand-text-secondary" />
-                      <span className="text-sm text-brand-text-secondary">用户名</span>
-                    </div>
-                    <span className="font-mono text-sm font-bold">{server.username}</span>
-                  </div>
-                  <div className="h-px bg-brand-border" />
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <Key className="w-4 h-4 text-brand-text-secondary" />
-                      <span className="text-sm text-brand-text-secondary">密码</span>
-                    </div>
-                    <span className="font-mono text-sm font-bold text-brand-accent">{server.password || '不适用'}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <h3 className="text-xs font-bold uppercase tracking-widest text-brand-text-secondary flex items-center gap-2">
-                  <Activity className="w-3 h-3" />
-                  系统信息
-                </h3>
-                <div className="space-y-4 bg-brand-bg/50 p-6 rounded-2xl border border-brand-border">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-brand-text-secondary">最后检查</span>
-                    <span className="text-sm font-medium">{server.lastChecked}</span>
-                  </div>
-                  <div className="h-px bg-brand-border" />
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-brand-text-secondary">标识符</span>
-                    <span className="text-xs font-mono text-brand-text-secondary">{server.id}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Notes Section */}
-              {server.notes && (
-                <div className="space-y-4">
-                  <h3 className="text-xs font-bold uppercase tracking-widest text-brand-text-secondary flex items-center gap-2">
-                    <FileText className="w-3 h-3" />
-                    备注
-                  </h3>
-                  <div className="bg-brand-bg/50 p-6 rounded-2xl border border-brand-border">
-                    <p className="text-sm text-brand-text-secondary whitespace-pre-wrap">{server.notes}</p>
-                  </div>
-                </div>
-              )}
-            </div>
+      {/* 页面标题和状态 */}
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-6">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-accent/20 to-purple-500/10 flex items-center justify-center border border-brand-accent/20 shadow-lg shadow-brand-accent/10">
+            <Server className="w-7 h-7 text-brand-accent" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-black tracking-tight">{server.name}</h2>
+            <code className="text-brand-accent font-mono bg-brand-accent/10 px-3 py-1 rounded-lg text-sm">{server.ip}</code>
           </div>
         </div>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={onEdit}
+            className="flex items-center gap-2 bg-brand-accent/10 text-brand-accent px-5 py-2.5 rounded-2xl border border-brand-accent/20 hover:bg-brand-accent hover:text-white hover:shadow-lg hover:shadow-brand-accent/20 transition-all font-bold text-sm"
+          >
+            <Edit2 className="w-4 h-4" />
+            编辑
+          </button>
+          <div className={cn(
+            "flex items-center gap-3 px-5 py-2.5 rounded-2xl border font-bold text-sm uppercase tracking-wider",
+            server.status === 'online' && "status-online",
+            server.status === 'offline' && "status-offline",
+            server.status === 'maintenance' && "status-maintenance"
+          )}>
+            <div className={cn("w-2 h-2 rounded-full animate-pulse", statusColors[server.status])} />
+            {server.status}
+          </div>
+        </div>
+      </div>
 
-        {/* Right Column: Services */}
-        <div className="w-full md:w-96 space-y-6">
-          <div className="glass rounded-3xl p-8">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xs font-bold uppercase tracking-widest text-brand-text-secondary flex items-center gap-2">
-                <Terminal className="w-3 h-3" />
+      {/* 左右两栏布局：左边服务健康状态，右边凭证信息 */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* 左侧：服务健康状态 - 占2列 */}
+        <div className="lg:col-span-2">
+          <div className="glass rounded-3xl p-6 shadow-xl shadow-black/5 border-2 border-brand-accent/20">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-bold uppercase tracking-widest text-brand-accent flex items-center gap-2">
+                <Terminal className="w-4 h-4" />
                 服务健康状态
               </h3>
               <button
@@ -280,33 +220,28 @@ export function ServerDetail({ server, onEdit, onBack, onRefreshServer }: Server
                 刷新
               </button>
             </div>
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {server.services.map((service, idx) => (
-                <div key={idx} className="p-4 rounded-2xl bg-brand-bg border border-brand-border space-y-2">
+                <div key={idx} className={cn(
+                  "p-4 rounded-2xl border-2 space-y-3",
+                  service.status === 'online' ? "bg-green-500/5 border-green-500/20" : "bg-red-500/5 border-red-500/20"
+                )}>
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-sm">{service.name}</span>
                     <div className="flex items-center gap-2">
-                      {service.healthUrl && (
-                        <button
-                          onClick={() => checkServiceHealth(service.name, service.healthUrl!)}
-                          disabled={checkingService === service.name}
-                          className="text-brand-text-secondary hover:text-brand-accent disabled:opacity-50"
-                          title="验证服务状态"
-                        >
-                          <RotateCw className={cn("w-3 h-3", checkingService === service.name && "animate-spin")} />
-                        </button>
-                      )}
-                      <span className={cn(
-                        "text-[9px] font-bold uppercase px-2 py-0.5 rounded border",
-                        service.status === 'online' ? "text-green-500 border-green-500/20 bg-green-500/10" : "text-red-500 border-red-500/20 bg-red-500/10"
-                      )}>
-                        {service.status}
-                      </span>
+                      <div className={cn("w-2.5 h-2.5 rounded-full animate-pulse", statusColors[service.status])} />
+                      <span className="font-bold text-sm">{service.name}</span>
                     </div>
+                    {service.healthUrl && (
+                      <button
+                        onClick={() => checkServiceHealth(service.name, service.healthUrl!)}
+                        disabled={checkingService === service.name}
+                        className="text-brand-text-secondary hover:text-brand-accent disabled:opacity-50"
+                        title="验证服务状态"
+                      >
+                        <RotateCw className={cn("w-3 h-3", checkingService === service.name && "animate-spin")} />
+                      </button>
+                    )}
                   </div>
-                  {service.notes && (
-                    <p className="text-xs text-brand-text-secondary">{service.notes}</p>
-                  )}
                   {service.healthUrl && (
                     <a
                       href={service.healthUrl}
@@ -314,19 +249,71 @@ export function ServerDetail({ server, onEdit, onBack, onRefreshServer }: Server
                       rel="noopener noreferrer"
                       className="text-[10px] text-brand-accent hover:underline flex items-center gap-1 truncate"
                     >
-                      <LinkIcon className="w-2 h-2" />
-                      {service.healthUrl}
+                      <LinkIcon className="w-2 h-2 flex-shrink-0" />
+                      <span className="truncate">{service.healthUrl}</span>
                     </a>
+                  )}
+                  {service.notes && (
+                    <p className="text-xs text-brand-text-secondary line-clamp-2">{service.notes}</p>
                   )}
                 </div>
               ))}
               {server.services.length === 0 && (
-                <div className="text-center py-8 text-brand-text-secondary text-sm italic">
+                <div className="col-span-full text-center py-6 text-brand-text-secondary text-sm">
                   未配置服务
                 </div>
               )}
             </div>
           </div>
+        </div>
+
+        {/* 右侧：凭证、系统信息和备注 - 占1列 */}
+        <div className="space-y-6">
+          <div className="glass rounded-3xl p-6 shadow-xl shadow-black/5">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-brand-text-secondary flex items-center gap-2 mb-4">
+              <Shield className="w-3 h-3" />
+              访问凭证
+            </h3>
+            <div className="space-y-4 bg-brand-bg/50 p-4 rounded-2xl border border-brand-border">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-brand-text-secondary">用户名</span>
+                <span className="font-mono text-sm font-bold">{server.username}</span>
+              </div>
+              <div className="h-px bg-brand-border" />
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-brand-text-secondary">密码</span>
+                <span className="font-mono text-sm font-bold text-brand-accent">{server.password || '不适用'}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="glass rounded-3xl p-6 shadow-xl shadow-black/5">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-brand-text-secondary flex items-center gap-2 mb-4">
+              <Activity className="w-3 h-3" />
+              系统信息
+            </h3>
+            <div className="space-y-4 bg-brand-bg/50 p-4 rounded-2xl border border-brand-border">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-brand-text-secondary">最后检查</span>
+                <span className="text-xs font-medium">{server.lastChecked}</span>
+              </div>
+              <div className="h-px bg-brand-border" />
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-brand-text-secondary">标识符</span>
+                <span className="text-[10px] font-mono text-brand-text-secondary">{server.id.slice(0, 8)}</span>
+              </div>
+            </div>
+          </div>
+
+          {server.notes && (
+            <div className="glass rounded-3xl p-6 shadow-xl shadow-black/5">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-brand-text-secondary flex items-center gap-2 mb-4">
+                <FileText className="w-3 h-3" />
+                备注
+              </h3>
+              <p className="text-sm text-brand-text-secondary whitespace-pre-wrap">{server.notes}</p>
+            </div>
+          )}
         </div>
       </div>
     </motion.div>

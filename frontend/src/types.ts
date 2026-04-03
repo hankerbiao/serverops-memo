@@ -92,3 +92,10 @@ export interface ExtractedServerInfo {
   notes?: string;
   services: ExtractedService[];
 }
+
+export interface AIConfig {
+  id?: number;
+  aiUrl: string;
+  aiModel: string;
+  updatedAt: string;
+}

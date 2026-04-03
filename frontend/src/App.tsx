@@ -4,10 +4,11 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ServerInfo, ServerPayload, Service } from './types';
 import { ServerCard, ServerModal, ServerDetail, ServiceList, DeleteConfirmModal, QuickAddModal } from './components/ServerComponents';
 import AIChat from './components/AIChat';
+import SettingsPage from './components/Settings';
 import { cn } from './lib/utils';
 import { createServer, deleteServer, fetchServers, updateServer } from './lib/api';
 
-type ActiveTab = 'servers' | 'services' | 'detail';
+type ActiveTab = 'servers' | 'services' | 'detail' | 'settings';
 
 export default function App() {
   const [servers, setServers] = useState<ServerInfo[]>([]);
@@ -187,7 +188,11 @@ export default function App() {
             active={activeTab === 'services'}
             onClick={() => setActiveTab('services')}
           />
-          <NavItem icon={<Settings className="w-5 h-5" />} />
+          <NavItem
+            icon={<Settings className="w-5 h-5" />}
+            active={activeTab === 'settings'}
+            onClick={() => setActiveTab('settings')}
+          />
         </div>
         
         <div className="pb-4 flex flex-col items-center gap-4">
@@ -324,6 +329,17 @@ export default function App() {
                 onBack={() => setActiveTab('servers')}
                 onRefreshServer={handleRefreshServer}
               />
+            </motion.div>
+          )}
+
+          {activeTab === 'settings' && (
+            <motion.div
+              key="settings"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+            >
+              <SettingsPage onBack={() => setActiveTab('servers')} />
             </motion.div>
           )}
         </AnimatePresence>

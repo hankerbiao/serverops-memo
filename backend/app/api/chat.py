@@ -32,15 +32,15 @@ def post_chat(payload: ChatRequest, session: Session = Depends(get_session)) -> 
 @router.post("/api/assistant/query", response_model=AssistantResponse)
 def query_assistant(payload: ChatRequest, session: Session = Depends(get_session)) -> AssistantResponse:
     """Query AI assistant with local AI."""
-    answer = generate_assistant_answer(payload.message, list_servers(session))
+    answer = generate_assistant_answer(payload.message, list_servers(session), session)
     return AssistantResponse(answer=answer)
 
 
 @router.post("/api/ai/extract-server", response_model=ExtractServerResponse)
-def post_extract_server(payload: ExtractServerRequest) -> ExtractServerResponse:
+def post_extract_server(payload: ExtractServerRequest, session: Session = Depends(get_session)) -> ExtractServerResponse:
     """Extract server info from natural language description."""
     try:
-        extracted = extract_server_info(payload.description)
+        extracted = extract_server_info(payload.description, session)
         return ExtractServerResponse(success=True, data=extracted)
     except Exception as e:
         return ExtractServerResponse(success=False, error=str(e))

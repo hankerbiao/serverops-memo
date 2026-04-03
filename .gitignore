@@ -28,9 +28,6 @@ pip-delete-this-directory.txt
 htmlcov/
 .tox/
 .nox/
-*.db
-*.sqlite
-*.sqlite3
 
 # Virtual Environment
 .venv/
@@ -79,7 +76,6 @@ logs/
 # Backend specific
 # ===========================
 backend/__pycache__/
-backend/*.db
 backend/.serverops-backend.log
 backend/.serverops-backend.pid
 backend/.ruff_cache/

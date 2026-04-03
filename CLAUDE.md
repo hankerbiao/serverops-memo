@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project Overview
 
 **ServerOps** is a full-stack server management application with:
-- **Backend**: FastAPI + SQLite (SQLModel) + Google GenAI for chat
+- **Backend**: FastAPI + SQLite (SQLModel) + Qwen3 (local LLM)
 - **Frontend**: React 19 + TypeScript + Vite + Tailwind CSS
 
 ## Running the Application
@@ -16,19 +16,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # Install dependencies
 pip install -r backend/requirements.txt
 
-# Start the API server
-uvicorn backend.main:app --reload --port 8000
-
-# Or use the convenience script
-backend/server.sh start
-backend/server.sh stop
-backend/server.sh restart
-backend/server.sh logs
+# Start the API server (default port 8889)
+uvicorn backend.app.main:app --reload --port 8889
 ```
-
-Required environment variables:
-- `GEMINI_API_KEY` - Google GenAI API key for chat functionality
-- `SERVEROPS_DATABASE_URL` - SQLite database URL (default: `sqlite:///./serverops.db`)
 
 ### Frontend
 
@@ -37,7 +27,7 @@ Required environment variables:
 cd frontend && npm install
 
 # Create .env.local for API base URL
-echo "VITE_API_BASE_URL=http://127.0.0.1:8000" > frontend/.env.local
+echo "VITE_API_BASE_URL=http://127.0.0.1:8889" > frontend/.env.local
 
 # Start development server
 cd frontend && npm run dev
@@ -47,8 +37,46 @@ cd frontend && npm run dev
 
 ```bash
 # Backend tests
-pytest backend/tests/test_api.py -v
+pytest backend/tests/ -v
 ```
+
+## Architecture
+
+### Backend (FastAPI)
+
+The backend uses a modular structure under `backend/app/`:
+
+| Directory | Purpose |
+|-----------|---------|
+| `api/` | Route handlers (servers, tags, chat) |
+| `models/` | SQLModel entities (Server, Alert) |
+| `schemas/` | Pydantic request/response models |
+| `services/` | Business logic (health_check, chat_service, alert_service) |
+
+Key files:
+- `backend/app/main.py` - FastAPI app factory with CORS and lifespan
+- `backend/app/config.py` - Settings via pydantic-settings
+- `backend/app/database.py` - SQLModel session management
+
+### Frontend (React)
+
+| Directory | Purpose |
+|-----------|---------|
+| `src/components/` | React components (AIChat, ServerComponents) |
+| `src/lib/` | API client (`api.ts`) and utilities |
+
+## Environment Variables
+
+All backend variables use `SERVEROPS_` prefix:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `AI_URL` | `http://10.17.150.235:8000/v1` | LLM service endpoint |
+| `AI_MODEL` | `/models/Qwen/Qwen3-30B-A3B-Instruct-2507` | Model name |
+| `HEALTH_CHECK_INTERVAL` | `300` | Health check interval (seconds) |
+| `ALERT_ENABLED` | `true` | Enable alert notifications |
+| `ALERT_WEBHOOK_URL` | `http://rdm.cooacloud.com/api/platform/notify/bot` | Alert webhook |
+| `DATABASE_URL` | `sqlite:///./serverops.db` | Database connection |
 
 ## API Endpoints
 
@@ -59,28 +87,16 @@ pytest backend/tests/test_api.py -v
 | POST | `/api/servers` | Create a server |
 | PUT | `/api/servers/{id}` | Update a server |
 | DELETE | `/api/servers/{id}` | Delete a server |
-| POST | `/api/chat` | Chat with AI about servers |
+| GET | `/api/tags` | List all tags |
+| POST | `/api/tags` | Create a tag |
+| POST | `/api/assistant/query` | AI chat about servers |
+| POST | `/api/ai/extract-server` | Extract server info from natural language |
 
-## Architecture
+## Key Features
 
-### Backend (FastAPI)
-
-- `backend/main.py` - FastAPI app factory with CORS middleware
-- `backend/models.py` - SQLModel entities: `Server` and `Service`
-- `backend/services.py` - Business logic for CRUD and chat
-- `backend/schemas.py` - Pydantic request/response models
-- `backend/db.py` - SQLModel session management
-
-### Frontend (React)
-
-- `frontend/src/App.tsx` - Main application component
-- `frontend/src/lib/` - API client and utilities
-- `frontend/src/components/` - React components
-- `frontend/src/types.ts` - TypeScript interfaces
-
-## Key Technical Details
-
-- Backend uses SQLModel with SQLite for persistence
-- CORS is configured to allow `http://localhost:3000` and `http://127.0.0.1:3000`
-- Frontend loads infrastructure data from the FastAPI backend
-- Chat endpoint uses Google GenAI to answer questions about servers
+- **Server management**: CRUD operations for servers with IP, credentials, tags
+- **Health monitoring**: Automatic health checks every 5 minutes (configurable)
+- **Service health checks**: HTTP health check URLs for services
+- **AI chat**: Query servers using local Qwen3 LLM
+- **AI extraction**: Parse natural language to extract server info
+- **Alert notifications**: Webhook-based failure alerts

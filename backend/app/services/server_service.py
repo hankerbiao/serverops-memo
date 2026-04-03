@@ -123,7 +123,41 @@ def delete_tag(session: Session, tag_id: str) -> bool:
 
 
 def create_server(session: Session, payload: ServerWrite) -> ServerRead:
-    """Create a new server."""
+    """Create a new server, or add services to existing server if IP already exists."""
+    # Check if server with same IP already exists
+    statement = select(Server).where(Server.ip == payload.ip)
+    existing_server = session.exec(statement).first()
+
+    if existing_server:
+        # Add services to existing server
+        existing_service_names = {s.name for s in existing_server.services}
+        for service in payload.services:
+            if service.name not in existing_service_names:
+                existing_server.services.append(
+                    Service(
+                        name=service.name,
+                        health_url=service.health_url or None,
+                        status=service.status or "online",
+                        category=service.category or None,
+                        aliases=list(service.aliases),
+                        notes=service.notes or None,
+                        server_id=existing_server.id,
+                    )
+                )
+
+        # Update server info if provided
+        if payload.name and payload.name != existing_server.name:
+            existing_server.name = payload.name
+        if payload.notes and payload.notes != existing_server.notes:
+            existing_server.notes = payload.notes
+
+        existing_server.last_checked = datetime.now(timezone.utc)
+        session.add(existing_server)
+        session.commit()
+        session.refresh(existing_server)
+        return to_server_read(existing_server)
+
+    # Create new server
     server = Server(
         id=uuid4().hex,
         name=payload.name,
